@@ -27,8 +27,14 @@ func Connect() { // ฟังก์ชันสำหรับเชื่อม
 		log.Fatal(err) // ถ้าเกิด error ให้แสดง log และหยุดโปรแกรม
 	}
 
-	Collection = client.Database("testdb").Collection("users")
-	// กำหนดค่า Collection ให้ชี้ไปที่ collection "users" ใน database "testdb"
+	Collection = client.Database("PokeDex").Collection("users")
+	// กำหนดค่า Collection ให้ชี้ไปที่ collection "users" ใน database "PokeDex"
 
 	fmt.Printf("Connection to MongoDB\n")
+
+	collections, err := client.Database("PokeDex").ListCollectionNames(ctx, struct{}{})
+	if err != nil {
+		log.Fatal(err) // ถ้าเกิด error ในการดึงชื่อ collection ให้แสดง log และหยุดโปรแกรม
+	}
+	fmt.Println("Collections in PokeDex:", collections)
 }
