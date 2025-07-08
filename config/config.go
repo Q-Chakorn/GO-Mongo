@@ -3,8 +3,7 @@ package config
 import (
 	"os"
 
-	// นำเข้า viper สำหรับจัดการไฟล์ config
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v3" // นำเข้า package yaml สำหรับอ่านไฟล์ YAML
 )
 
 type MongoConnect struct {
@@ -16,17 +15,17 @@ type MongoConnect struct {
 	Collection string `yaml:"collection"` // ชื่อ collection ที่ต้องการเชื่อมต่อ
 }
 
-type loginParam struct {
+type LoginWithParam struct {
 	MongoDB MongoConnect `yaml:"mongodb"` // กำหนดโครงสร้างสำหรับการเชื่อมต่อ MongoDB
 }
 
-func LoadConfig(path string) (*loginParam, error) {
-	file, err := os.Open(path)
+func LoadConfig(path string) (*LoginWithParam, error) {
+	file, err := os.Open(path) //os ทำหน้าที่เปิดไฟล์ config ที่ระบุใน path
 	if err != nil {
 		return nil, err // ถ้าเปิดไฟล์ไม่สำเร็จ ให้คืนค่า error
 	}
 	defer file.Close()               // ปิดไฟล์เมื่อฟังก์ชันจบการทำงาน
-	var config loginParam            // สร้างตัวแปรสำหรับเก็บข้อมูล config
+	var config LoginWithParam        // สร้างตัวแปรสำหรับเก็บข้อมูล config
 	decoder := yaml.NewDecoder(file) // สร้าง decoder สำหรับอ่านไฟล์ YAML
 	err = decoder.Decode(&config)
 	if err != nil {
