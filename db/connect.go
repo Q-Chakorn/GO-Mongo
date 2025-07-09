@@ -7,31 +7,11 @@ import (
 	"log"             // นำเข้า log สำหรับแสดง log ข้อผิดพลาด
 	"time"            // นำเข้า time สำหรับใช้งานเกี่ยวกับเวลา
 
-	// นำเข้า encoding/json สำหรับแปลงข้อมูลเป็น JSON
 	"go.mongodb.org/mongo-driver/mongo"         // นำเข้า mongo driver สำหรับเชื่อมต่อ MongoDB
 	"go.mongodb.org/mongo-driver/mongo/options" // นำเข้า options สำหรับตั้งค่าการเชื่อมต่อ MongoDB
 )
 
 var Collection *mongo.Collection // ประกาศตัวแปร global สำหรับเก็บ collection ที่จะใช้งาน
-
-// func Connect() { // ฟังก์ชันสำหรับเชื่อมต่อ MongoDB
-// 	connectOptions := options.Client().ApplyURI("mongodb://localhost:27017/?authSource=admin") // สร้าง connectOptions โดยกำหนด URI สำหรับเชื่อมต่อ MongoDB
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)                                        // สร้าง context ที่มี timeout 10 วินาที เพื่อป้องกันการเชื่อมต่อนานเกินไป
-// 	defer cancel()                                                                                                  // เมื่อฟังก์ชันจบ ให้ยกเลิก context เพื่อคืน resource
-// 	client, err := mongo.Connect(ctx, connectOptions)                                                               // เชื่อมต่อ MongoDB ด้วย connectOptions และ context ที่กำหนด
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	} // ถ้าเกิด error ให้แสดง log และหยุดโปรแกรม
-
-// 	Collection = client.Database("admin").Collection("PokeDex") // กำหนดค่า Collection ให้ชี้ไปที่ collection "users" ใน database "PokeDex"
-// 	fmt.Printf("Connection to MongoDB\n")
-
-// 	collections, err := client.Database("admin").ListCollectionNames(ctx, struct{}{}) // เรียกใช้ ListCollectionNames เพื่อดึงชื่อ collection ทั้งหมดใน database "admin"
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	} // ถ้าเกิด error ในการดึงชื่อ collection ให้แสดง log และหยุดโปรแกรม
-// 	fmt.Println("Collections in PokeDex:", collections)
-// }
 
 func Connect(cfg *config.LoginWithParam) { // ฟังก์ชันสำหรับเชื่อมต่อ MongoDB โดยรับค่า config เป็นพารามิเตอร์
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%d", // สร้าง URI สำหรับเชื่อมต่อ MongoDB จากค่าที่กำหนดใน config
@@ -56,19 +36,23 @@ func Connect(cfg *config.LoginWithParam) { // ฟังก์ชันสำห�
 		log.Fatal(err)
 	} // ถ้าเกิด error ในการดึงชื่อ collection ให้แสดง log และหยุดโปรแกรม
 	fmt.Println("Collections in PokeDex:", collections)
-
-	showDocument, err := Collection.Find(ctx, struct{}{}) // ใช้ Find เพื่อดึงข้อมูลทั้งหมดจาก collection ที่กำหนด
-	if err != nil {
-		log.Fatal(err) // ถ้าเกิด error ให้แสดง log และหยุดโปรแกรม
-	}
-	defer showDocument.Close(ctx) // ปิด showdocument เมื่อจบการใช้งาน
-
-	fmt.Printf("Documents in collection %s:\n", cfg.MongoDB.Collection) // แสดงข้อความว่าเริ่มแสดงข้อมูลใน collection ที่กำหนด
-	for showDocument.Next(ctx) {
-		var result map[string]interface{}                    // สร้างตัวแปร result เพื่อเก็บข้อมูลที่ดึงมา
-		if err := showDocument.Decode(&result); err != nil { // ใช้ Decode เพื่อแปลงข้อมูลที่ดึงมาเป็น map
-			log.Fatal(err)
-		}
-		fmt.Println(result) // แสดงข้อมูลที่ดึงมา
-	}
 }
+
+// func Connect() { // ฟังก์ชันสำหรับเชื่อมต่อ MongoDB
+// 	connectOptions := options.Client().ApplyURI("mongodb://localhost:27017/?authSource=admin") // สร้าง connectOptions โดยกำหนด URI สำหรับเชื่อมต่อ MongoDB
+// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)                                        // สร้าง context ที่มี timeout 10 วินาที เพื่อป้องกันการเชื่อมต่อนานเกินไป
+// 	defer cancel()                                                                                                  // เมื่อฟังก์ชันจบ ให้ยกเลิก context เพื่อคืน resource
+// 	client, err := mongo.Connect(ctx, connectOptions)                                                               // เชื่อมต่อ MongoDB ด้วย connectOptions และ context ที่กำหนด
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	} // ถ้าเกิด error ให้แสดง log และหยุดโปรแกรม
+
+// 	Collection = client.Database("admin").Collection("PokeDex") // กำหนดค่า Collection ให้ชี้ไปที่ collection "users" ใน database "PokeDex"
+// 	fmt.Printf("Connection to MongoDB\n")
+
+// 	collections, err := client.Database("admin").ListCollectionNames(ctx, struct{}{}) // เรียกใช้ ListCollectionNames เพื่อดึงชื่อ collection ทั้งหมดใน database "admin"
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	} // ถ้าเกิด error ในการดึงชื่อ collection ให้แสดง log และหยุดโปรแกรม
+// 	fmt.Println("Collections in PokeDex:", collections)
+// }

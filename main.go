@@ -3,7 +3,12 @@ package main
 import (
 	"GO-Mongo/config"
 	"GO-Mongo/db"
+	"context"
 	"log"
+)
+
+var (
+	ctx context.Context // ประกาศตัวแปร ctx สำหรับจัดการ context
 )
 
 func main() {
@@ -11,7 +16,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.Connect(cfg) //เรียกใช้ฟังก์ชันเชื่อมต่อฐานข้อมูล MongoDB
-
-	//router := gin.Default() //สร้าง router(obj กำหนดเส้นทาง HTTP request) หลักสำหรับรับส่ง HTTP request
+	db.Connect(cfg)           //เรียกใช้ฟังก์ชันเชื่อมต่อฐานข้อมูล MongoDB
+	db.ShowDocument(ctx, cfg) //เรียกใช้ฟังก์ชันแสดงข้อมูลใน collection ที่กำหนดใน config
 }
