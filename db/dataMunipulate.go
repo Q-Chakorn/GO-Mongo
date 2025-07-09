@@ -3,6 +3,7 @@ package db
 import (
 	"GO-Mongo/config"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 )
@@ -23,5 +24,14 @@ func ShowDocument(ctx context.Context, cfg *config.LoginWithParam) {
 			log.Fatal(err)
 		}
 		fmt.Println(result) // แสดงข้อมูลที่ดึงมา
+		var resultJSON map[string]interface{}
+		if err := showdocument.Decode(&resultJSON); err != nil {
+			log.Fatal(err)
+		}
+		jsonData, err := json.MarshalIndent(resultJSON, "", "  ") // แปลงข้อมูลเป็น JSON format
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(jsonData)) // แสดงข้อมูลในรูปแบบ JSON
 	}
 }
