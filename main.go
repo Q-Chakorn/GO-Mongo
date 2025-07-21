@@ -16,6 +16,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.Connect(cfg)           //เรียกใช้ฟังก์ชันเชื่อมต่อฐานข้อมูล MongoDB
+	db.Connect(cfg) //เรียกใช้ฟังก์ชันเชื่อมต่อฐานข้อมูล MongoDB
+	db.CheckAndCreateDatabase(ctx, db.Collection.Database().Client(), cfg.MongoDB.Database)
 	db.ShowDocument(ctx, cfg) //เรียกใช้ฟังก์ชันแสดงข้อมูลใน collection ที่กำหนดใน config
+
 }
