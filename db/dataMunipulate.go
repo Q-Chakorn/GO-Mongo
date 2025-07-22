@@ -10,39 +10,57 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// ฟังก์ชันสำหรับตรวจสอบและสร้าง database ถ้าไม่มี
 func CheckAndCreateDatabase(ctx context.Context, client *mongo.Client, databaseName string) {
-	// ดึงรายชื่อ database ทั้งหมด
 	databases, err := client.ListDatabaseNames(ctx, struct{}{})
 	if err != nil {
-		log.Fatal("Error listing databases:", err)
+		log.Fatal("Error listing databases:", err) // ถ้าเกิด error ในการดึงชื่อ database ให้แสดง log และหยุดโปรแกรม
 	}
-
-	// ตรวจสอบว่ามี database ที่ต้องการหรือไม่
-	databaseExists := false
+	databasesExists := false
 	for _, db := range databases {
 		if db == databaseName {
-			databaseExists = true
-			fmt.Printf("Database '%s' already exists\n", databaseName)
+			databasesExists = true // ถ้า database ที่ต้องการมีอยู่แล้ว ให้เปลี่ยนค่าเป็น true
+			fmt.Println("Database already exists:", databaseName)
 			break
 		}
 	}
-
-	// ถ้าไม่มี database ให้สร้างใหม่
-	if !databaseExists {
-		fmt.Printf("Database '%s' not found. Creating...\n", databaseName)
-		// สร้าง collection dummy เพื่อให้ database ถูกสร้างขึ้น (MongoDB สร้าง database เมื่อมี collection แรก)
-		collection := client.Database(databaseName).Collection("temp_collection")
-		_, err := collection.InsertOne(ctx, map[string]interface{}{"temp": "data"})
+	if !databasesExists {
+		fmt.Println("Creating database:", databaseName)                           // ใน MongoDB การสร้าง database จะเกิดขึ้นเมื่อมีการเพิ่ม collection หรือ document
+		collection := client.Database(databaseName).Collection("temp_Collection") // สร้าง collection ชั่วคราวเพื่อสร้าง database
+		_, err := collection.InsertOne(ctx, struct{}{})                           // แทรก document ว่างเปล่าเพื่อสร้าง database
 		if err != nil {
-			log.Fatal("Error creating database:", err)
+			log.Fatal("Error creating database:", err) // ถ้าเกิด error ในการสร้าง database ให้แสดง log และหยุดโปรแกรม
 		}
-		// ลบ document ที่เพิ่งสร้าง (optional)
-		_, err = collection.DeleteOne(ctx, map[string]interface{}{"temp": "data"})
+		_, err = collection.DeleteOne(ctx, struct{}{}) // ลบ collection ชั่วคราวหลังจากสร้าง database เสร็จ
 		if err != nil {
-			log.Fatal("Error cleaning up temp data:", err)
+			log.Fatal("Error deleting temporary collection:", err) // ถ้าเกิด error ในการลบ collection ชั่วคราว ให้แสดง log และหยุดโปรแกรม
 		}
-		fmt.Printf("Database '%s' created successfully\n", databaseName)
+	}
+	fmt.Printf("Database '%s' created successfully\n", databaseName) // แสดงชื่อ database ทั้งหมดที่มีอยู่
+}
+func CheckCollection(ctx context.Context, client *mongo.Client, databaseName string, collectionName string) {
+	collections, err := client.Database(databaseName).ListCollectionNames(ctx, struct{}{}) // ดึงชื่อ collection ทั้งหมดใน database ที่กำหนด
+	if err != nil {
+		log.Fatal("Error listing collections:", err) // ถ้าเกิด error ในการดึงชื่อ collection ให้แสดง log และหยุดโปรแกรม
+	}
+	collectionsExists := false
+	for _, coll := range collections {
+		if coll == collectionName {
+			collectionsExists = true // ถ้า collection ที่ต้องการมีอยู่แล้ว ให้เปลี่ยนค่าเป็น true
+			fmt.Println("Collection already exists:", collectionName)
+			break
+		}
+	}
+	if !collectionsExists {
+		fmt.Println("Creating collection:", collectionName)                    // ถ้า collection ไม่อยู่ ให้สร้าง collection ใหม่
+		collection := client.Database(databaseName).Collection(collectionName) // เข้าถึง collection ที่ต้องการ
+		_, err := collection.InsertOne(ctx, struct{}{})                        // แทรก document ว่างเปล่าเพื่อสร้าง collection
+		if err != nil {
+			log.Fatal("Error creating collection:", err) // ถ้าเกิด error ในการสร้าง collection ให้แสดง log และหยุดโปรแกรม
+		}
+		_, err = collection.DeleteOne(ctx, struct{}{}) // ลบ document ว่างเปล่าหลังจากสร้าง collection เสร็จ
+		if err != nil {
+			log.Fatal("Error deleting temporary document:", err) // ถ้าเกิด error ในการลบ document ว่างเปล่า ให้แสดง log และหยุดโปรแกรม
+		}
 	}
 }
 
