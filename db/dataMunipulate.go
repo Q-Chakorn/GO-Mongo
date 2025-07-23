@@ -52,7 +52,7 @@ func CheckCollection(ctx context.Context, client *mongo.Client, databaseName str
 	}
 	if !collectionsExists {
 		fmt.Println("Creating collection:", collectionName)                    // ถ้า collection ไม่อยู่ ให้สร้าง collection ใหม่
-		collection := client.Database(databaseName).Collection(collectionName) // เข้าถึง collection ที่ต้องการ
+		collection := client.Database(databaseName).Collection(collectionName) // สร้าง collection ใหม่
 		_, err := collection.InsertOne(ctx, struct{}{})                        // แทรก document ว่างเปล่าเพื่อสร้าง collection
 		if err != nil {
 			log.Fatal("Error creating collection:", err) // ถ้าเกิด error ในการสร้าง collection ให้แสดง log และหยุดโปรแกรม
