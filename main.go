@@ -20,6 +20,6 @@ func main() {
 	db.CheckAndCreateDatabase(ctx, db.Collection.Database().Client(), cfg.MongoDB.Database)
 	db.CheckCollection(ctx, db.Collection.Database().Client(), cfg.MongoDB.Database, "pokemons") //ตรวจสอบและสร้าง collection ถ้ายังไม่มี
 	// db.CheckCollection(ctx, db.Collection.Database().Client(), cfg.MongoDB.Database, "TM")
-	db.ShowDocument(ctx, cfg) //เรียกใช้ฟังก์ชันแสดงข้อมูลใน collection ที่กำหนดใน config
+	// db.ShowDocument(ctx, cfg) //เรียกใช้ฟังก์ชันแสดงข้อมูลใน collection ที่กำหนดใน config
 
 }
